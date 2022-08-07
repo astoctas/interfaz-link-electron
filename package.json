@@ -1,7 +1,7 @@
 {
   "name": "interfaz-link",
   "version": "1.0.0",
-  "description": "",
+  "description": "Socket para acceder a la interfaz a través del puerto serie.",
   "main": "index.js",
   "engines": {
     "node": "16.5.0"
@@ -15,6 +15,10 @@
     "files": [
       "**/*",
       "resources/",
+      "resources/64.png",
+      "css/",
+      "js/",
+      "src/public/",
       "build/interfaz.png"
     ]
   },
@@ -24,20 +28,18 @@
     "dist": "electron-builder",
     "install": "electron-rebuild",
     "pack": "electron-builder --dir",
-    "pack-win": "build --dir --win --ia32",
-    "dist-win": "build --win --ia32"
+    "pack-win32": "electron-builder build --dir --win --ia32",
+    "dist-win32": "electron-builder build --win --ia32"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "electron": "^15.0.0",
+    "electron-packager": "^15.5.1",
     "electron-builder": "^23.3.3"
   },
   "dependencies": {
-    "electron-packager": "^15.5.1",
-    "electron-reload": "^2.0.0-alpha.1",
     "fs": "^0.0.1-security",
-    "handler": "^0.1.3",
     "http": "^0.0.1-security",
     "johnny-five": "^2.1.0",
     "materialize-css": "^1.0.0",
