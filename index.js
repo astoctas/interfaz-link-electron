@@ -72,7 +72,9 @@ const createWindow = () => {
 
 var  iconPath = os.platform() == 'win32' ? path.join(__dirname,'resources', '64.png') : 'resources/64.png';
 var trayIcon = nativeImage.createFromPath(iconPath);
-//trayIcon = trayIcon.resize({ width: 32, height: 32 });
+if (process.platform == 'darwin') {
+  trayIcon = trayIcon.resize({ width: 16, height: 16 });
+}
 tray = new Tray(trayIcon)
 const contextMenu = Menu.buildFromTemplate([
 { label: 'Abrir', type: 'normal', click:  function() {
