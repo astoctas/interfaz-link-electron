@@ -1,13 +1,8 @@
 
+M.AutoInit();
 
-var $sel = document.getElementById('select-ports');
-$sel.innerHTML = "";
-
-const b = window.serialportsAPI.listSerialPorts()
-b.then(c => console.log(c))
-
+// LISTAR SOCKETS
 var socketPort = 4268;
-
 const _ips = window.socketAPI.listSockets();
 _ips.then(ips => {
     ips.forEach(function(i,v){
@@ -15,4 +10,45 @@ _ips.then(ips => {
       })
 })
 
-M.AutoInit();
+
+// LISTAR PUERTOS
+var portlist = [];
+function portsChange() {
+
+  var $sel = document.getElementById('select-ports');
+  const b = window.serialportsAPI.listSerialPorts()
+  b.then(p => {
+    //console.log(p, portlist) 
+    if(p.length == portlist.length) return;
+    $sel.innerHTML = "";
+    var el = document.createElement("option");
+    el.text = "Automático";
+    el.value  =  "auto";
+    $sel.appendChild(el);
+    p.forEach(port => {
+      let el = document.createElement("option");
+      el.text = port.path + (port.manufacturer ? " "+port.manufacturer : "");
+      el.value  =  port.path;
+      $sel.appendChild(el);
+    })
+    M.FormSelect.init($sel, {});  
+    
+    // CONECTAR AL NUEVO PUERTO SI ESTA DESCONECTADO Y EN AUTOMATICO
+
+    // TODO VERIFICAR SI ESTA DESCONECTADO Y EN AUTOMATICO ///////////
+    let difference = p.filter(x => !portlist.includes(x.path));
+    if(difference.length == 1) {
+      console.log(difference[0]);
+      // TODO INTENTAR CONEXION //
+    } 
+    
+    portlist = []; 
+    p.forEach(port => {
+      portlist.push(port.path);
+    })
+
+  })
+}
+
+setInterval(portsChange, 2000);
+
