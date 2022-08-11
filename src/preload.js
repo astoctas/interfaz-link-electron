@@ -1,7 +1,12 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
-contextBridge.exposeInMainWorld('serialportsAPI',{
-  listSerialPorts: () => ipcRenderer.invoke('serialport:list')
+contextBridge.exposeInMainWorld('serialportAPI',{
+  listSerialPorts: () => ipcRenderer.invoke('serialport:list'),
+  connect: (port) => ipcRenderer.invoke('serialport:connect', port),
+  connected: () => ipcRenderer.invoke('serialport:connected'),
+  relaunch: () => ipcRenderer.invoke('serialport:relaunch'),
+  handleError: (callback) => ipcRenderer.on('serialport:handleError', callback)
+
 })
 
 contextBridge.exposeInMainWorld('socketAPI',{

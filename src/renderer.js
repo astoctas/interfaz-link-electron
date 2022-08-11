@@ -13,18 +13,26 @@ _ips.then(ips => {
 
 // LISTAR PUERTOS
 var portlist = [];
+var $sel = document.getElementById('select-ports');
+
+function saveAndConnect(port) {
+  window.localStorage.setItem("port", port);
+  window.serialportAPI.relaunch()      
+}
+
 function portsChange() {
 
-  var $sel = document.getElementById('select-ports');
-  const b = window.serialportsAPI.listSerialPorts()
+  const b = window.serialportAPI.listSerialPorts()
   b.then(p => {
     //console.log(p, portlist) 
     if(p.length == portlist.length) return;
     $sel.innerHTML = "";
+    /*
     var el = document.createElement("option");
     el.text = "Automático";
     el.value  =  "auto";
     $sel.appendChild(el);
+    */
     p.forEach(port => {
       let el = document.createElement("option");
       el.text = port.path + (port.manufacturer ? " "+port.manufacturer : "");
@@ -32,15 +40,17 @@ function portsChange() {
       $sel.appendChild(el);
     })
     M.FormSelect.init($sel, {});  
-    
-    // CONECTAR AL NUEVO PUERTO SI ESTA DESCONECTADO Y EN AUTOMATICO
 
-    // TODO VERIFICAR SI ESTA DESCONECTADO Y EN AUTOMATICO ///////////
-    let difference = p.filter(x => !portlist.includes(x.path));
-    if(difference.length == 1) {
-      console.log(difference[0]);
-      // TODO INTENTAR CONEXION //
-    } 
+    // CONECTAR AL NUEVO PUERTO SI ESTA DESCONECTADO 
+    let newports = p.filter(x => !portlist.includes(x.path)) ;
+    console.log(newports);
+    window.serialportAPI.connected().then(v => {
+      if(!v) {
+        if(newports.length == 1) {
+          saveAndConnect(newports[0].path);
+        } 
+      }
+    });
     
     portlist = []; 
     p.forEach(port => {
@@ -50,5 +60,50 @@ function portsChange() {
   })
 }
 
+
+// INIT
+var connectBtn = document.getElementById('connectBtn');
+var errorMsg = document.getElementById("error-msg");
+var connectedMsg = document.getElementById("connected-msg");
+var disconnectedMsg = document.getElementById("disconnected-msg");
+var notificationTitle = "Interfaz ";
+
+disconnectedMsg.classList.remove("hide");
 setInterval(portsChange, 2000);
 
+window.serialportAPI.handleError((event, value) => {
+  console.log(value);
+  if(value.type == "error") {
+    errorMsg.classList.remove("hide");
+  }
+  if(value.type == "disconnect") {
+    disconnectedMsg.classList.remove("hide");
+    connectedMsg.classList.add("hide");
+    let myNotification = new Notification(notificationTitle, {
+      body: 'Interfaz desconectada'
+    })       
+  }
+})
+
+connectBtn.addEventListener("click", function () {
+  saveAndConnect($sel.value);
+})
+
+if(port = window.localStorage.getItem("port")) {
+  console.log("Conectando al inicio a ", port);
+  window.serialportAPI.connect(port).then(r => {
+    errorMsg.classList.add("hide");
+    disconnectedMsg.classList.add("hide");
+    connectedMsg.classList.remove("hide");
+    // TODO IDENTIFICAR MODELO
+    model = "interfaz";
+    if(model == "rasti") {
+      notificationTitle += "Rasti";
+    } else {
+      notificationTitle += "Robótica";
+    }    
+    let myNotification = new Notification(notificationTitle, {
+      body: 'Interfaz conectada en '+ port
+    })    
+  })
+}

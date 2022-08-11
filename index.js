@@ -4,16 +4,37 @@ var os = require('os');
 
 const { SerialPort } = require('serialport')
 
-const io = require("./src/server.js")
-require("./src/serial.js")
+const Socket = require("./src/socket.js")
+const Serial = require("./src/serial.js")
+
+Socket.socket.init();
 
 
-async function listSerialPorts() {
-    const ports  =  await SerialPort.list();
+async function serialPortList() {
+    const ports  =  await Serial.serial.serialport.list();
     return ports;
 }
 
-async function listSockets() {
+function errorCallback(err) {
+  console.log("ERROR CALLBACK", err)
+  mainWindow.webContents.send('serialport:handleError', err)
+}
+
+async function serialPortConnect(event, port) {
+  return await Serial.serial.connect(port, errorCallback);
+}
+
+async function serialPortConnected(event) {
+  return await Serial.serial.isConnected();
+}
+
+async function serialPortRelaunch(event) {
+  app.relaunch()
+  app.exit()
+}
+
+
+async function socketList() {
   var ifaces = os.networkInterfaces();
   var ips = new Array("127.0.0.1");
   
@@ -129,8 +150,11 @@ const contextMenu = Menu.buildFromTemplate([
   app.commandLine.appendSwitch("disable-background-timer-throttling");
 
   app.whenReady().then(() => {
-    ipcMain.handle('serialport:list', listSerialPorts)
-    ipcMain.handle('socket:list', listSockets)
+    ipcMain.handle('serialport:list', serialPortList)
+    ipcMain.handle('serialport:connect', serialPortConnect)
+    ipcMain.handle('serialport:connected', serialPortConnected)
+    ipcMain.handle('serialport:relaunch', serialPortRelaunch)
+    ipcMain.handle('socket:list', socketList)
 
     createWindow()
   
