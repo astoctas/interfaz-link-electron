@@ -15,13 +15,16 @@ async function serialPortList() {
     return ports;
 }
 
-function errorCallback(err) {
+function connectCallback(err) {
   console.log("ERROR CALLBACK", err)
-  mainWindow.webContents.send('serialport:handleError', err)
+  if(err.type == "connect") {
+    Socket.socket.ifaz = Serial.serial.getIfaz();
+  }
+  mainWindow.webContents.send('serialport:handleConnectCallback', err)
 }
 
 async function serialPortConnect(event, port) {
-  return await Serial.serial.connect(port, errorCallback);
+  return await Serial.serial.connect(port, connectCallback);
 }
 
 async function serialPortConnected(event) {
@@ -88,10 +91,12 @@ const createWindow = () => {
       height: 600,
       webPreferences: { backgroundThrottling: false,
         autoHideMenuBar: true, nodeIntegration: true, contextIsolation: true, preload: path.join(__dirname, 'src/preload.js') },
-    icon: path.join(__dirname, 'resources','64.png')
+      icon: path.join(__dirname, 'resources','64.png')
 
     })
-  
+
+
+    mainWindow.setIcon(path.join(__dirname, 'resources','64.png'))
     mainWindow.loadFile('index.html')
   
 

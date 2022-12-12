@@ -13,6 +13,7 @@ _ips.then(ips => {
 
 // LISTAR PUERTOS
 var portlist = [];
+var serialport;
 var $sel = document.getElementById('select-ports');
 
 function saveAndConnect(port) {
@@ -71,10 +72,26 @@ var notificationTitle = "Interfaz ";
 disconnectedMsg.classList.remove("hide");
 setInterval(portsChange, 2000);
 
-window.serialportAPI.handleError((event, value) => {
+window.serialportAPI.handleConnectCallback((event, value) => {
   console.log(value);
+  if(value.type == "connect") {
+    errorMsg.classList.add("hide");
+    disconnectedMsg.classList.add("hide");
+    connectedMsg.classList.remove("hide");
+    // TODO IDENTIFICAR MODELO
+    model = "interfaz";
+    if(model == "rasti") {
+      notificationTitle += "Rasti";
+    } else {
+      notificationTitle += "Robótica";
+    }    
+    let myNotification = new Notification(notificationTitle, {
+      body: value.msg
+    })    
+  }
   if(value.type == "error") {
     errorMsg.classList.remove("hide");
+    return;
   }
   if(value.type == "disconnect") {
     disconnectedMsg.classList.remove("hide");
@@ -92,18 +109,5 @@ connectBtn.addEventListener("click", function () {
 if(port = window.localStorage.getItem("port")) {
   console.log("Conectando al inicio a ", port);
   window.serialportAPI.connect(port).then(r => {
-    errorMsg.classList.add("hide");
-    disconnectedMsg.classList.add("hide");
-    connectedMsg.classList.remove("hide");
-    // TODO IDENTIFICAR MODELO
-    model = "interfaz";
-    if(model == "rasti") {
-      notificationTitle += "Rasti";
-    } else {
-      notificationTitle += "Robótica";
-    }    
-    let myNotification = new Notification(notificationTitle, {
-      body: 'Interfaz conectada en '+ port
-    })    
   })
 }

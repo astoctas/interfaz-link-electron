@@ -1,16 +1,22 @@
-var five = require('johnny-five');
-const { SerialPort } = require('serialport')
-
-/*
-*/
-const port = new SerialPort({ path: "/dev/tty.usbserial-A94FS1TK", baudRate: 115200 })
-
-this.board = new five.Board({
-  port: this.port,
+var five = require("johnny-five");
+var board = new five.Board({
+  baudrate: 57600,
   repl: false
 });
 
-this.board.on("ready", function() {
-  var led = new five.Led(13);
-  led.blink(500);
-}); 
+board.on("ready", function() {
+
+  const proximity = new five.Proximity({
+    controller: "HCSR04",
+    pin: "A0"
+  });
+
+  proximity.on("change", () => {
+    const {centimeters, inches} = proximity;
+    console.log("Proximity: ");
+    console.log("  cm  : ", centimeters);
+    console.log("  in  : ", inches);
+    console.log("-----------------");
+  });
+
+});

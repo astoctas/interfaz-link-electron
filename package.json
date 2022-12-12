@@ -28,6 +28,7 @@
     "dist": "electron-builder",
     "install": "electron-rebuild",
     "pack": "electron-builder --dir",
+    "pack-win": "electron-builder build --dir --win ",
     "pack-win32": "electron-builder build --dir --win --ia32",
     "dist-win32": "electron-builder build --win --ia32"
   },
@@ -40,12 +41,14 @@
     "electron-packager": "^15.5.1"
   },
   "dependencies": {
+    "color-string": "^1.9.1",
     "fs": "^0.0.1-security",
     "http": "^0.0.1-security",
     "johnny-five": "^2.1.0",
     "materialize-css": "^1.0.0",
     "path": "^0.12.7",
     "serialport": "^10.4.0",
-    "socket.io": "^4.5.1"
+    "socket.io": "^4.5.1",
+    "utf8": "^3.0.0"
   }
 }

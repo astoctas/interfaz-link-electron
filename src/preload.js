@@ -5,7 +5,7 @@ contextBridge.exposeInMainWorld('serialportAPI',{
   connect: (port) => ipcRenderer.invoke('serialport:connect', port),
   connected: () => ipcRenderer.invoke('serialport:connected'),
   relaunch: () => ipcRenderer.invoke('serialport:relaunch'),
-  handleError: (callback) => ipcRenderer.on('serialport:handleError', callback)
+  handleConnectCallback: (callback) => ipcRenderer.on('serialport:handleConnectCallback', callback)
 
 })
 
