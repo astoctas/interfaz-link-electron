@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Socket para acceder a la interfaz a través del puerto serie.",
   "main": "index.js",
-  "engines": {
-    "node": "16.5.0"
-  },
   "build": {
     "appId": "ar.robotica",
     "nsis": {
@@ -26,10 +23,12 @@
     "start": "electron .",
     "postinstall": "electron-builder install-app-deps",
     "dist": "electron-builder",
-    "install": "electron-rebuild",
+    "install": "electron-rebuild -f -w serialport",
     "pack": "electron-builder --dir",
     "pack-win": "electron-builder build --dir --win ",
     "pack-win32": "electron-builder build --dir --win --ia32",
+    "dist-win": "electron-builder -c electron-builder.yaml --windows --x64 ",
+    "dist-m1": "electron-builder --mac --universal -c.mac.identity=null",
     "dist-win32": "electron-builder build --win --ia32"
   },
   "author": "",
@@ -37,7 +36,8 @@
   "devDependencies": {
     "@types/node": "^18.6.4",
     "electron": "^15.0.0",
-    "electron-builder": "^23.3.3",
+    "electron-builder": "^22.13.1",
+    "electron-rebuild": "^3.2.9",
     "electron-packager": "^15.5.1"
   },
   "dependencies": {

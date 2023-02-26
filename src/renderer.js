@@ -15,6 +15,7 @@ _ips.then(ips => {
 var portlist = [];
 var serialport;
 var $sel = document.getElementById('select-ports');
+var firstTime = true;
 
 function saveAndConnect(port) {
   window.localStorage.setItem("port", port);
@@ -45,6 +46,7 @@ function portsChange() {
     // CONECTAR AL NUEVO PUERTO SI ESTA DESCONECTADO 
     let newports = p.filter(x => !portlist.includes(x.path)) ;
     console.log(newports);
+    if(!firstTime)
     window.serialportAPI.connected().then(v => {
       if(!v) {
         if(newports.length == 1) {
@@ -52,6 +54,7 @@ function portsChange() {
         } 
       }
     });
+    firstTime = false;
     
     portlist = []; 
     p.forEach(port => {
